@@ -80,3 +80,27 @@ body {
   color: #007bff;
   font-weight: 500;
 }
+
+.mode-section {
+  margin-bottom: 30px;
+}
+
+.mode-title {
+  background: #6c757d;
+  color: white;
+  padding: 12px 20px;
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.tense-section h4.tense-title {
+  background: #007bff;
+  color: white;
+  padding: 8px 15px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}

@@ -1,14 +1,18 @@
 <script>
   import { onMount } from 'svelte';
-  import conjuguaisonData from './conjuguaison.json';
   
   let searchTerm = '';
   let conjugations = [];
   let selectedVerb = null;
   let filteredVerbs = [];
   
-  onMount(() => {
-    conjugations = conjuguaisonData;
+  onMount(async () => {
+    try {
+      const response = await fetch('/conjuguaison.json');
+      conjugations = await response.json();
+    } catch (error) {
+      console.error('Erreur lors du chargement des conjugaisons:', error);
+    }
   });
   
   $: {
@@ -31,12 +35,23 @@
   const pronouns = ['je', 'tu', 'il/elle', 'nous', 'vous', 'ils/elles'];
   
   const tenses = [
-    { key: 'present', title: 'Présent' },
-    { key: 'imparfait', title: 'Imparfait' },
-    { key: 'passeSimple', title: 'Passé simple' },
-    { key: 'futurSimple', title: 'Futur simple' },
-    { key: 'passeCompose', title: 'Passé composé' },
-    { key: 'plusQueParfait', title: 'Plus-que-parfait' }
+    { key: 'present', title: 'Présent', mode: 'Indicatif' },
+    { key: 'imparfait', title: 'Imparfait', mode: 'Indicatif' },
+    { key: 'passeSimple', title: 'Passé simple', mode: 'Indicatif' },
+    { key: 'futurSimple', title: 'Futur simple', mode: 'Indicatif' },
+    { key: 'passeCompose', title: 'Passé composé', mode: 'Indicatif' },
+    { key: 'plusQueParfait', title: 'Plus-que-parfait', mode: 'Indicatif' },
+    { key: 'passeAnterieur', title: 'Passé antérieur', mode: 'Indicatif' },
+    { key: 'futurAnterieur', title: 'Futur antérieur', mode: 'Indicatif' },
+    { key: 'subjonctifPresent', title: 'Présent', mode: 'Subjonctif' },
+    { key: 'subjonctifImparfait', title: 'Imparfait', mode: 'Subjonctif' },
+    { key: 'subjonctifPasse', title: 'Passé', mode: 'Subjonctif' },
+    { key: 'subjonctifPlusQueParfait', title: 'Plus-que-parfait', mode: 'Subjonctif' },
+    { key: 'conditionnelPresent', title: 'Présent', mode: 'Conditionnel' },
+    { key: 'conditionnelPasse', title: 'Passé', mode: 'Conditionnel' },
+    { key: 'conditionnelPasseII', title: 'Passé 2ème forme', mode: 'Conditionnel' },
+    { key: 'imperatif', title: 'Présent', mode: 'Impératif' },
+    { key: 'imperatifPasse', title: 'Passé', mode: 'Impératif' }
   ];
 </script>
 
@@ -77,20 +92,27 @@
         {/if}
       </div>
       
-      {#each tenses as tense}
-        {#if selectedVerb[tense.key]}
-          <div class="tense-section">
-            <h3 class="tense-title">{tense.title}</h3>
-            <div class="conjugation-grid">
-              {#each selectedVerb[tense.key] as form, index}
-                <div class="pronoun-form">
-                  <span class="pronoun">{pronouns[index]}</span>
-                  <span class="form">{form}</span>
+      {#each ['Indicatif', 'Subjonctif', 'Conditionnel', 'Impératif'] as mode}
+        <div class="mode-section">
+          <h3 class="mode-title">{mode}</h3>
+          {#each tenses.filter(t => t.mode === mode) as tense}
+            {#if selectedVerb[tense.key]}
+              <div class="tense-section">
+                <h4 class="tense-title">{tense.title}</h4>
+                <div class="conjugation-grid">
+                  {#each selectedVerb[tense.key] as form, index}
+                    {#if form}
+                      <div class="pronoun-form">
+                        <span class="pronoun">{pronouns[index]}</span>
+                        <span class="form">{form}</span>
+                      </div>
+                    {/if}
+                  {/each}
                 </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
+              </div>
+            {/if}
+          {/each}
+        </div>
       {/each}
     </div>
   {/if}
