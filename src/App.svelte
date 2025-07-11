@@ -5,6 +5,7 @@
   let conjugations = [];
   let selectedVerb = null;
   let filteredVerbs = [];
+  let activeMode = 'Indicatif';
   
   onMount(async () => {
     try {
@@ -33,6 +34,11 @@
   }
   
   const pronouns = ['je', 'tu', 'il/elle', 'nous', 'vous', 'ils/elles'];
+  const modes = ['Indicatif', 'Subjonctif', 'Conditionnel', 'Impératif'];
+  
+  function setActiveMode(mode) {
+    activeMode = mode;
+  }
   
   const tenses = [
     { key: 'present', title: 'Présent', mode: 'Indicatif' },
@@ -92,28 +98,36 @@
         {/if}
       </div>
       
-      {#each ['Indicatif', 'Subjonctif', 'Conditionnel', 'Impératif'] as mode}
-        <div class="mode-section">
-          <h3 class="mode-title">{mode}</h3>
-          {#each tenses.filter(t => t.mode === mode) as tense}
-            {#if selectedVerb[tense.key]}
-              <div class="tense-section">
-                <h4 class="tense-title">{tense.title}</h4>
-                <div class="conjugation-grid">
-                  {#each selectedVerb[tense.key] as form, index}
-                    {#if form}
-                      <div class="pronoun-form">
-                        <span class="pronoun">{pronouns[index]}</span>
-                        <span class="form">{form}</span>
-                      </div>
-                    {/if}
-                  {/each}
-                </div>
+      <div class="tabs">
+        {#each modes as mode}
+          <button 
+            class="tab {activeMode === mode ? 'active' : ''}" 
+            on:click={() => setActiveMode(mode)}
+          >
+            {mode}
+          </button>
+        {/each}
+      </div>
+      
+      <div class="mode-content">
+        {#each tenses.filter(t => t.mode === activeMode) as tense}
+          {#if selectedVerb[tense.key]}
+            <div class="tense-section">
+              <h4 class="tense-title">{tense.title}</h4>
+              <div class="conjugation-grid">
+                {#each selectedVerb[tense.key] as form, index}
+                  {#if form}
+                    <div class="pronoun-form">
+                      <span class="pronoun">{pronouns[index]}</span>
+                      <span class="form">{form}</span>
+                    </div>
+                  {/if}
+                {/each}
               </div>
-            {/if}
-          {/each}
-        </div>
-      {/each}
+            </div>
+          {/if}
+        {/each}
+      </div>
     </div>
   {/if}
 </div>
@@ -164,5 +178,40 @@
     margin: 0 0 15px 0;
     color: #007bff;
     font-size: 24px;
+  }
+
+  .tabs {
+    display: flex;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 20px;
+    gap: 2px;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    border: none;
+    background: #f8f9fa;
+    color: #495057;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tab:hover {
+    background: #e9ecef;
+    color: #007bff;
+  }
+
+  .tab.active {
+    background: #007bff;
+    color: white;
+    border-bottom-color: #007bff;
+  }
+
+  .mode-content {
+    min-height: 200px;
   }
 </style>
