@@ -193,52 +193,56 @@
 
 	.loading {
 		text-align: center;
-		color: #007bff;
+		color: var(--text-accent);
 		font-style: italic;
 		margin-top: 10px;
+		transition: color 0.3s ease;
 	}
 
 	h1 {
-		color: #333;
+		color: var(--text-primary);
 		text-align: center;
 		margin-bottom: 30px;
+		transition: color 0.3s ease;
 	}
 
 	h2 {
 		margin: 0 0 15px 0;
-		color: #007bff;
+		color: var(--text-accent);
 		font-size: 24px;
+		transition: color 0.3s ease;
 	}
 
 	.tabs {
 		display: flex;
-		border-bottom: 2px solid #e9ecef;
+		border-bottom: 2px solid var(--border-light);
 		margin-bottom: 20px;
 		gap: 2px;
+		transition: border-color 0.3s ease;
 	}
 
 	.tab {
 		padding: 12px 20px;
 		border: none;
-		background: #f8f9fa;
-		color: #495057;
+		background: var(--bg-tertiary);
+		color: var(--text-secondary);
 		cursor: pointer;
 		font-size: 14px;
 		font-weight: 500;
 		border-radius: 6px 6px 0 0;
-		transition: all 0.2s ease;
+		transition: all 0.3s ease;
 		border-bottom: 2px solid transparent;
 	}
 
 	.tab:hover {
-		background: #e9ecef;
-		color: #007bff;
+		background: var(--border-light);
+		color: var(--text-accent);
 	}
 
 	.tab.active {
-		background: #007bff;
+		background: var(--text-accent);
 		color: white;
-		border-bottom-color: #007bff;
+		border-bottom-color: var(--text-accent);
 	}
 
 	.mode-content {
