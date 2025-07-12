@@ -10,7 +10,7 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch("/index.json");
+			const response = await fetch("./index.json");
 			verbsList = await response.json();
 		} catch (error) {
 			console.error("Erreur lors du chargement de l'index:", error);
@@ -37,7 +37,7 @@
 
 		loading = true;
 		try {
-			const response = await fetch(`/verbs/${infinitif}.json`);
+			const response = await fetch(`./verbs/${infinitif}.json`);
 			if (response.ok) {
 				const verb = await response.json();
 				verbCache.set(infinitif, verb);
