@@ -2,39 +2,59 @@
 	import { onMount } from "svelte";
 
 	let searchTerm = "";
-	let conjugations = [];
+	let verbsList = [];
 	let selectedVerb = null;
-	let filteredVerbs = [];
 	let activeMode = "Indicatif";
+	let loading = false;
+	let verbCache = new Map();
 
 	onMount(async () => {
 		try {
-			const response = await fetch("/conjuguaison.json");
-			conjugations = await response.json();
+			const response = await fetch("/index.json");
+			verbsList = await response.json();
 		} catch (error) {
-			console.error("Erreur lors du chargement des conjugaisons:", error);
+			console.error("Erreur lors du chargement de l'index:", error);
 		}
 	});
 
-	$: {
-		if (searchTerm.length > 1) {
-			filteredVerbs = conjugations
-				.filter((verb) =>
-					verb.infinitif
-						.toLowerCase()
-						.includes(searchTerm.toLowerCase()),
-				)
-				.slice(0, 10);
-		} else {
-			filteredVerbs = [];
+	async function loadVerb(infinitif) {
+		if (!infinitif || infinitif.trim() === "") {
 			selectedVerb = null;
+			return;
+		}
+
+		// Vérifier si le verbe existe dans l'index
+		if (!verbsList.includes(infinitif)) {
+			selectedVerb = null;
+			return;
+		}
+
+		// Vérifier le cache
+		if (verbCache.has(infinitif)) {
+			selectedVerb = verbCache.get(infinitif);
+			return;
+		}
+
+		loading = true;
+		try {
+			const response = await fetch(`/verbs/${infinitif}.json`);
+			if (response.ok) {
+				const verb = await response.json();
+				verbCache.set(infinitif, verb);
+				selectedVerb = verb;
+			} else {
+				selectedVerb = null;
+			}
+		} catch (error) {
+			console.error(`Erreur lors du chargement du verbe ${infinitif}:`, error);
+			selectedVerb = null;
+		} finally {
+			loading = false;
 		}
 	}
 
-	function selectVerb(verb) {
-		selectedVerb = verb;
-		searchTerm = verb.infinitif;
-		filteredVerbs = [];
+	function handleInput() {
+		loadVerb(searchTerm);
 	}
 
 	const pronouns = ["je", "tu", "il/elle", "nous", "vous", "ils/elles"];
@@ -81,20 +101,18 @@
 			type="text"
 			class="search-box"
 			placeholder="Rechercher un verbe..."
+			list="verbs-list"
 			bind:value={searchTerm}
+			on:input={handleInput}
 		/>
-
-		{#if filteredVerbs.length > 0}
-			<div class="suggestions">
-				{#each filteredVerbs as verb}
-					<button
-						class="suggestion-item"
-						on:click={() => selectVerb(verb)}
-					>
-						{verb.infinitif}
-					</button>
-				{/each}
-			</div>
+		<datalist id="verbs-list">
+			{#each verbsList as verb}
+				<option value={verb}></option>
+			{/each}
+		</datalist>
+		
+		{#if loading}
+			<div class="loading">Chargement...</div>
 		{/if}
 	</div>
 
@@ -173,34 +191,11 @@
 		margin-bottom: 20px;
 	}
 
-	.suggestions {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		background: white;
-		border: 1px solid #ddd;
-		border-top: none;
-		border-radius: 0 0 4px 4px;
-		max-height: 200px;
-		overflow-y: auto;
-		z-index: 10;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	}
-
-	.suggestion-item {
-		display: block;
-		width: 100%;
-		padding: 10px 15px;
-		border: none;
-		background: none;
-		text-align: left;
-		cursor: pointer;
-		font-size: 14px;
-	}
-
-	.suggestion-item:hover {
-		background-color: #f8f9fa;
+	.loading {
+		text-align: center;
+		color: #007bff;
+		font-style: italic;
+		margin-top: 10px;
 	}
 
 	h1 {
